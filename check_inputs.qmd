@@ -1,0 +1,216 @@
+
+
+# Check inputs for a plan
+
+## Define plan to check
+
+```{r}
+#| label: define-plan
+
+plan <- "abc"
+# template <- "data_extraction_template_v0.1.xlsx"
+template <- "data_extraction_template_v0.2.xlsx"
+
+```
+
+## Setup
+
+```{r}
+#| label: libraries
+
+libs <- function() {
+  library(rlang)
+  library(tidyverse)
+  tprint <- 75 # default tibble print
+  options(tibble.print_max = tprint, tibble.print_min = tprint) # show up to tprint rows
+
+  # tools
+  library(fs)
+  library(stringr)
+  library(vroom)
+  library(readxl)
+  library(openxlsx2) # for writing xlsx files
+  library(lubridate)
+  library(RColorBrewer)
+  library(RcppRoll)
+  library(fredr)
+  library(tidycensus)
+
+  # boyd libraries
+  library(btools)
+  library(bdata)
+  library(bggtools)
+  library(bmaps)
+
+  # graphics
+  library(scales)
+  library(ggbeeswarm)
+  library(patchwork)
+  library(gridExtra)
+  library(ggrepel)
+  library(ggbreak)
+
+  # tables
+  library(formattable)
+  library(knitr)
+  library(kableExtra)
+  library(DT)
+  library(gt)
+  library(gtExtras)
+  library(janitor)
+  library(skimr)
+  library(vtable)
+
+  # maps
+  # library(maps)
+  # # https://cran.r-project.org/web/packages/usmap/vignettes/mapping.html
+  # library(usmap)
+}
+
+suppressMessages(libs())
+
+```
+
+```{r}
+#| label: locations
+
+OD <- r"(C:\Users\donbo\OneDrive\Documents\Reason_RockCollege_PensionTool\Data_extraction_template)"
+template_path <- fs::path(OD, template)
+
+HH <- here::here()
+newfile <- paste0(fs::path_ext_remove(template), "_check.xlsx")
+check_path <- fs::path(HH, newfile)
+
+```
+
+```{r}
+#| label: copy-file
+#| eval: false
+
+fs::file_copy(path = template_path, new_path = check_path, overwrite = TRUE)
+
+```
+
+## Check file structure
+
+```{r}
+#| label: get-sheets
+
+sheets <- readxl::excel_sheets(check_path)
+
+```
+
+
+```{r}
+#| label: sheet-functions
+
+get_data <- function(sheet, path = check_path) {
+  info <- suppressMessages(read_excel(
+    path,
+    sheet = sheet,
+    range = "A1:B5",
+    col_names = c("item", "value")
+  ))
+  info <- bind_rows(tibble(item = "sheet", value = sheet), info)
+
+  range <- info |> filter(item == "range") |> pull(value)
+
+  data <- suppressMessages(read_excel(
+    check_path,
+    sheet = sheet,
+    range = range,
+    col_types = "text"
+  ))
+  list(info = info, data = data)
+}
+
+show_sheets <- function(sheets_to_show) {
+  for (s in sheets_to_show) {
+    msg <- paste0("\n### ", s, "\n\n")
+    cat(msg)
+    res <- get_data(s)
+
+    if (interactive()) {
+      print(knitr::kable(res$info)) # Simple table for interactive
+    } else {
+      knitr::knit_print(
+        knitr::kable(res$info) %>%
+          kableExtra::kable_styling(
+            bootstrap_options = "striped",
+            full_width = FALSE
+          )
+      )
+    }
+
+    if (interactive()) {
+      print(knitr::kable(res$data)) # Simple table for interactive
+    } else {
+      knitr::knit_print(
+        knitr::kable(res$data) %>%
+          kableExtra::kable_styling(
+            bootstrap_options = "striped",
+            full_width = FALSE
+          )
+      )
+    }
+
+    # knitr::knit_print(
+    #   res$info |>
+    #     knitr::kable() |>
+    #     kable_styling(bootstrap_options = "striped", full_width = FALSE)
+    # )
+
+    # knitr::knit_print(
+    #   res$data |>
+    #     knitr::kable() |>
+    #     kable_styling(bootstrap_options = "striped", full_width = FALSE)
+    # )
+  }
+}
+
+```
+
+
+## Headcount sheets
+
+```{r}
+#| label: headcount
+#| results: asis
+
+sheets_to_show <- sheets |> stringr::str_subset("headcount")
+show_sheets(sheets_to_show)
+
+```
+
+
+## Salary sheets
+
+```{r}
+#| label: salary
+#| results: asis
+
+sheets_to_show <- sheets |>
+  stringr::str_subset("salary") |>
+  stringr::str_subset("growth", negate = TRUE)
+
+show_sheets(sheets_to_show)
+
+```
+
+## Salary growth
+
+```{r}
+#| results: asis
+
+sheets_to_show <- sheets |>
+  stringr::str_subset("salary_growth")
+
+show_sheets(sheets_to_show)
+
+```
+
+
+
+```{r stop_here, echo=FALSE}
+knitr::knit_exit()
+```
