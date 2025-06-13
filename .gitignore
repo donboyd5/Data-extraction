@@ -1,0 +1,10 @@
+
+# folders
+.quarto/
+check_inputs_files/
+
+# file types
+*.html
+*.xls*
+
+# individual files
