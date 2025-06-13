@@ -1,5 +1,6 @@
 project:
-  title: "Check inputs for a plan"
+  type: book
+  output-dir: _webpage  
 
 format:
   html:
@@ -7,7 +8,7 @@ format:
     code-fold: true
     number-depth: 5
     toc-depth: 5
-    toc-expand: false    
+    toc-expand: false
 
 editor_options:
   chunk_output_type: console
@@ -17,3 +18,15 @@ execute:
   echo: true
   output: true
   freeze: false  # auto: during global project renders, re-render only when source changes
+
+book:
+  title: "Check inputs for a plan"
+  author: "Reason Foundation and Rockefeller College"
+  date: today
+  date-format: long
+  sidebar:
+    collapse-level: 1
+  chapters:
+    - index.qmd # index.qmd must be in the quarto project root folder
+    - check_inputs.qmd
+

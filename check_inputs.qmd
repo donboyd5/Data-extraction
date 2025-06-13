@@ -1,4 +1,11 @@
-
+---
+format:
+  html:
+    toc: true
+    toc-depth: 4
+    page-layout: full
+    css: wider.css
+---    
 
 # Check inputs for a plan
 
@@ -98,6 +105,11 @@ fs::file_copy(path = template_path, new_path = check_path, overwrite = TRUE)
 
 sheets <- readxl::excel_sheets(check_path)
 
+# define sheets to show
+exclude <- c("process", "conventions", "abbreviations", "sheets")
+sheets_show <- setdiff(sheets, exclude)
+sheets_sort <- sheets_show |> sort()
+
 ```
 
 
@@ -113,27 +125,35 @@ get_data <- function(sheet, path = check_path) {
   ))
   info <- bind_rows(tibble(item = "sheet", value = sheet), info)
 
-  range <- info |> filter(item == "range") |> pull(value)
+  range <- NULL
+  if ("range" %in% info$item) {
+    range <- info |> filter(item == "range") |> pull(value)
+  }
 
-  data <- suppressMessages(read_excel(
-    check_path,
-    sheet = sheet,
-    range = range,
-    col_types = "text"
-  ))
-  list(info = info, data = data)
+  data <- NULL
+  if (!is.null(range)) {
+    data <- suppressMessages(read_excel(
+      check_path,
+      sheet = sheet,
+      range = range,
+      col_types = "text"
+    ))
+  }
+
+  return(list(info = info, data = data))
 }
 
 show_sheets <- function(sheets_to_show) {
   for (s in sheets_to_show) {
-    msg <- paste0("\n### ", s, "\n\n")
+    msg <- paste0("\n## ", s, "\n\n")
     cat(msg)
     res <- get_data(s)
 
+    cat("\n### Sheet info\n\n")
     if (interactive()) {
       print(knitr::kable(res$info)) # Simple table for interactive
     } else {
-      knitr::knit_print(
+      print(
         knitr::kable(res$info) %>%
           kableExtra::kable_styling(
             bootstrap_options = "striped",
@@ -142,32 +162,37 @@ show_sheets <- function(sheets_to_show) {
       )
     }
 
-    if (interactive()) {
+    cat("\n### Sheet data\n\n")
+    if (interactive() & !is.null(res$data)) {
       print(knitr::kable(res$data)) # Simple table for interactive
-    } else {
-      knitr::knit_print(
+    } else if (!is.null(res$data)) {
+      print(
         knitr::kable(res$data) %>%
           kableExtra::kable_styling(
             bootstrap_options = "striped",
             full_width = FALSE
-          )
+          ) |>
+          kableExtra::scroll_box(width = "100%", height = "auto")
       )
     }
-
-    # knitr::knit_print(
-    #   res$info |>
-    #     knitr::kable() |>
-    #     kable_styling(bootstrap_options = "striped", full_width = FALSE)
-    # )
-
-    # knitr::knit_print(
-    #   res$data |>
-    #     knitr::kable() |>
-    #     kable_styling(bootstrap_options = "striped", full_width = FALSE)
-    # )
   }
 }
 
+```
+
+## Show sheets
+```{r}
+#| label: abc
+#| results: asis
+
+sheets_to_show <- sheets_sort
+show_sheets(sheets_to_show)
+
+```
+
+
+```{r echo=FALSE}
+knitr::knit_exit()
 ```
 
 

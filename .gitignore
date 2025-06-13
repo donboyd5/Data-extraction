@@ -2,9 +2,12 @@
 # folders
 .quarto/
 check_inputs_files/
+_webpage/
 
 # file types
 *.html
 *.xls*
 
 # individual files
+
+/.quarto/
