@@ -6,6 +6,7 @@ _webpage/
 
 # file types
 *.html
+*.vdoc*
 *.xls*
 
 # individual files
