@@ -16,7 +16,8 @@ format:
 
 plan <- "abc"
 # template <- "data_extraction_template_v0.1.xlsx"
-template <- "data_extraction_template_v0.2.xlsx"
+# template <- "data_extraction_template_v0.2.xlsx"
+template <- "data_extraction_template_v0.3.xlsm"
 
 ```
 
@@ -83,9 +84,10 @@ suppressMessages(libs())
 
 OD <- r"(C:\Users\donbo\OneDrive\Documents\Reason_RockCollege_PensionTool\Data_extraction_template)"
 template_path <- fs::path(OD, template)
+template_ext <- fs::path_ext(template_path)
 
 HH <- here::here()
-newfile <- paste0(fs::path_ext_remove(template), "_check.xlsx")
+newfile <- paste0(fs::path_ext_remove(template), "_check.", template_ext)
 check_path <- fs::path(HH, newfile)
 
 ```
@@ -106,7 +108,8 @@ fs::file_copy(path = template_path, new_path = check_path, overwrite = TRUE)
 sheets <- readxl::excel_sheets(check_path)
 
 # define sheets to show
-exclude <- c("process", "conventions", "abbreviations", "sheets")
+# exclude <- c("process", "conventions", "abbreviations", "sheets")
+exclude <- c("0_process", "0_conventions", "0_abbreviations", "0_sheets")
 sheets_show <- setdiff(sheets, exclude)
 sheets_sort <- sheets_show |> sort()
 
@@ -116,26 +119,51 @@ sheets_sort <- sheets_show |> sort()
 ```{r}
 #| label: sheet-functions
 
+get_item <- function(s, info) {
+  value <- info$value[info$item == s]
+}
+
+item_exists <- function(s, info) {
+  any(info$item == s & !is.na(info$value))
+}
+
+get_limits <- function(info) {
+  limits <- NULL
+  if (
+    item_exists("start_col", info) &&
+      item_exists("end_col", info) &&
+      item_exists("start_row", info)
+  ) {
+    start_col <- cellranger::letter_to_num(get_item("start_col", info))
+    end_col <- cellranger::letter_to_num(get_item("end_col", info))
+    start_row <- get_item("start_row", info) |> as.numeric()
+    # Create cell_limits object
+    limits <- cell_limits(
+      ul = c(start_row, start_col),
+      lr = c(NA, end_col) # NA means go to bottom of the sheet
+    )
+  }
+  limits
+}
+
 get_data <- function(sheet, path = check_path) {
   info <- suppressMessages(read_excel(
     path,
     sheet = sheet,
-    range = "A1:B5",
+    range = cell_cols("A:B"),
     col_names = c("item", "value")
   ))
   info <- bind_rows(tibble(item = "sheet", value = sheet), info)
 
-  range <- NULL
-  if ("range" %in% info$item) {
-    range <- info |> filter(item == "range") |> pull(value)
-  }
+  limits <- get_limits(info)
 
   data <- NULL
-  if (!is.null(range)) {
+  # only get data if we have a valid limits object
+  if (!is.null(limits)) {
     data <- suppressMessages(read_excel(
       check_path,
       sheet = sheet,
-      range = range,
+      range = limits,
       col_types = "text"
     ))
   }
@@ -180,9 +208,10 @@ show_sheets <- function(sheets_to_show) {
 
 ```
 
+
 ## Show sheets
 ```{r}
-#| label: abc
+#| label: show-sheets
 #| results: asis
 
 sheets_to_show <- sheets_sort
@@ -195,47 +224,3 @@ show_sheets(sheets_to_show)
 knitr::knit_exit()
 ```
 
-
-## Headcount sheets
-
-```{r}
-#| label: headcount
-#| results: asis
-
-sheets_to_show <- sheets |> stringr::str_subset("headcount")
-show_sheets(sheets_to_show)
-
-```
-
-
-## Salary sheets
-
-```{r}
-#| label: salary
-#| results: asis
-
-sheets_to_show <- sheets |>
-  stringr::str_subset("salary") |>
-  stringr::str_subset("growth", negate = TRUE)
-
-show_sheets(sheets_to_show)
-
-```
-
-## Salary growth
-
-```{r}
-#| results: asis
-
-sheets_to_show <- sheets |>
-  stringr::str_subset("salary_growth")
-
-show_sheets(sheets_to_show)
-
-```
-
-
-
-```{r stop_here, echo=FALSE}
-knitr::knit_exit()
-```
