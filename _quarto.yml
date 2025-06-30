@@ -31,3 +31,6 @@ book:
     - check_inputs.qmd
     - tests.qmd
 
+
+# script to clean desktop.ini just inside .git/:
+# Get-ChildItem -Path .git -Filter desktop.ini -Recurse | Remove-Item -Force
