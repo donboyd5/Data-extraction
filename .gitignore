@@ -1,15 +1,24 @@
+# project infrastructure
+.quarto/
+/.quarto/
+.Rproj.user
+.Rhistory
+*.Rproj
+desktop.ini
 
 # folders
-.quarto/
 check_inputs_files/
+**/old/
 _webpage/
 
 # file types
+*.csv
+*.docx
+*.gdoc
 *.html
+*.pdf
 *.vdoc*
 *.xls*
 
 # individual files
-
-/.quarto/
-.Rproj.user
+plans/frs/work/reason/Florida FRS model input_djb.R
