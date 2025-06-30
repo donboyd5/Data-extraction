@@ -9,86 +9,51 @@ format:
 
 # Check inputs for a plan
 
+
+```{r}
+#| label: libraries
+
+source(here::here("setup.R"))
+
+```
+
+```{r}
+#| label: setup-test-infrastructure
+
+# usethis::use_testthat()
+# usethis::use_test() # initialize a basic test file and open it for editing
+
+```
+
 ## Define plan to check
 
 ```{r}
 #| label: define-plan
 
-plan <- "abc"
-# template <- "data_extraction_template_v0.1.xlsx"
-# template <- "data_extraction_template_v0.2.xlsx"
-template <- "data_extraction_template_v0.3.xlsm"
+plan <- "frs"
+
+xddir <- fs::path(HH, "plans", plan)
+xdpath <- fs::path(xddir, extracted_data)
+
+sheets <- readxl::excel_sheets(xdpath)
+extracted_data <- paste0(plan, "_extracted_data.xlsm")
 
 ```
 
 ## Setup
 
-```{r}
-#| label: libraries
 
-libs <- function() {
-  library(rlang)
-  library(tidyverse)
-  tprint <- 75 # default tibble print
-  options(tibble.print_max = tprint, tibble.print_min = tprint) # show up to tprint rows
-
-  # tools
-  library(fs)
-  library(stringr)
-  library(vroom)
-  library(readxl)
-  library(openxlsx2) # for writing xlsx files
-  library(lubridate)
-  library(RColorBrewer)
-  library(RcppRoll)
-  library(fredr)
-  library(tidycensus)
-
-  # boyd libraries
-  library(btools)
-  library(bdata)
-  library(bggtools)
-  library(bmaps)
-
-  # graphics
-  library(scales)
-  library(ggbeeswarm)
-  library(patchwork)
-  library(gridExtra)
-  library(ggrepel)
-  library(ggbreak)
-
-  # tables
-  library(formattable)
-  library(knitr)
-  library(kableExtra)
-  library(DT)
-  library(gt)
-  library(gtExtras)
-  library(janitor)
-  library(skimr)
-  library(vtable)
-
-  # maps
-  # library(maps)
-  # # https://cran.r-project.org/web/packages/usmap/vignettes/mapping.html
-  # library(usmap)
-}
-
-suppressMessages(libs())
-
-```
 
 ```{r}
 #| label: locations
 
-OD <- r"(C:\Users\donbo\OneDrive\Documents\Reason_RockCollege_PensionTool\Data_extraction_template)"
-template_path <- fs::path(OD, template)
-template_ext <- fs::path_ext(template_path)
+# OD <- r"(C:\Users\donbo\OneDrive\Documents\Reason_RockCollege_PensionTool\Data_extraction_template)"
+# template_path <- fs::path(OD, template)
+# template_ext <- fs::path_ext(template_path)
 
 HH <- here::here()
-newfile <- paste0(fs::path_ext_remove(template), "_check.", template_ext)
-check_path <- fs::path(HH, newfile)
+# newfile <- paste0(fs::path_ext_remove(template), "_check.", template_ext)
+# check_path <- fs::path(HH, newfile)
 
 ```
 
@@ -100,12 +65,11 @@ fs::file_copy(path = template_path, new_path = check_path, overwrite = TRUE)
 
 ```
 
-## Check file structure
+## Get extracted inputs
+
 
 ```{r}
 #| label: get-sheets
-
-sheets <- readxl::excel_sheets(check_path)
 
 # define sheets to show
 # exclude <- c("process", "conventions", "abbreviations", "sheets")
@@ -114,6 +78,14 @@ sheets_show <- setdiff(sheets, exclude)
 sheets_sort <- sheets_show |> sort()
 
 ```
+
+## Check file structure
+
+[TO COME]
+
+-   Are all required sheets in place?
+-   Do all sheets pass minimal checks?
+
 
 
 ```{r}
