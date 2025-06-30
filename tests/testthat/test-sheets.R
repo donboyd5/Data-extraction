@@ -13,7 +13,7 @@ sheets <- readxl::excel_sheets(xdpath)
 
 test_that("Workbook has required exact-match sheets", {
   required_sheets <- c("salary_growth", "retirees")
-  cat("\n## Testing for required Sheets:\n")
+  cat("\n## Testing for existence of following required sheets:\n")
   cat(paste(required_sheets, collapse = ", "), "\n")
 
   expect_true(all(required_sheets %in% sheets))

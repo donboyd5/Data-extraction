@@ -13,7 +13,11 @@ source(here::here("plans", plan, "lookup-functions.R"))
 
 # load lookup table and test data
 benefit_rules <- read_excel(xdpath, sheet = "benefit_rules", range = "D9:P98")
-test_cases <- read_excel(xdpath, sheet = "benefit_rules_test", range = "D6:L56")
+test_cases <- read_excel(
+  xdpath,
+  sheet = "benefit_rules_test",
+  range = "D11:L61"
+)
 
 test_that("benmult_function matches expected benmult", {
   tc <- test_cases |>

@@ -9,7 +9,7 @@ format:
 
 
 ```{r}
-#| label: libraries
+#| label: setup
 
 source(here::here("setup.R"))
 

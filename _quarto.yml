@@ -28,8 +28,8 @@ book:
     collapse-level: 1
   chapters:
     - index.qmd # index.qmd must be in the quarto project root folder
-    # - check_inputs.qmd
-    - tests.qmd
+    - run_tests.qmd
+    - show_worksheets.qmd
 
 
 # script to clean desktop.ini just inside .git/:

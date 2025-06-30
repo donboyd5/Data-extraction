@@ -7,66 +7,43 @@ format:
     css: wider.css
 ---    
 
-# Check inputs for a plan
+# Show plan worksheets
 
 
 ```{r}
-#| label: libraries
+#| label: setup
+
+plan <- "frs"
 
 source(here::here("setup.R"))
 
-```
-
-```{r}
-#| label: setup-test-infrastructure
-
-# usethis::use_testthat()
-# usethis::use_test() # initialize a basic test file and open it for editing
+xddir <- fs::path(here::here(), "plans", plan)
+extracted_data <- paste0(plan, "_extracted_data.xlsm")
+xdpath <- fs::path(xddir, extracted_data)
 
 ```
+
 
 ## Define plan to check
 
 ```{r}
-#| label: define-plan
-
-plan <- "frs"
-
-xddir <- fs::path(HH, "plans", plan)
-xdpath <- fs::path(xddir, extracted_data)
+#| label: get-sheetnames
 
 sheets <- readxl::excel_sheets(xdpath)
-extracted_data <- paste0(plan, "_extracted_data.xlsm")
 
 ```
 
 ## Setup
 
-
-
-```{r}
-#| label: locations
-
-# OD <- r"(C:\Users\donbo\OneDrive\Documents\Reason_RockCollege_PensionTool\Data_extraction_template)"
-# template_path <- fs::path(OD, template)
-# template_ext <- fs::path_ext(template_path)
-
-HH <- here::here()
-# newfile <- paste0(fs::path_ext_remove(template), "_check.", template_ext)
-# check_path <- fs::path(HH, newfile)
-
-```
-
 ```{r}
 #| label: copy-file
 #| eval: false
 
-fs::file_copy(path = template_path, new_path = check_path, overwrite = TRUE)
+# fs::file_copy(path = template_path, new_path = check_path, overwrite = TRUE)
 
 ```
 
 ## Get extracted inputs
-
 
 ```{r}
 #| label: get-sheets
@@ -78,14 +55,6 @@ sheets_show <- setdiff(sheets, exclude)
 sheets_sort <- sheets_show |> sort()
 
 ```
-
-## Check file structure
-
-[TO COME]
-
--   Are all required sheets in place?
--   Do all sheets pass minimal checks?
-
 
 
 ```{r}
@@ -118,7 +87,7 @@ get_limits <- function(info) {
   limits
 }
 
-get_data <- function(sheet, path = check_path) {
+get_data <- function(sheet, path) {
   info <- suppressMessages(read_excel(
     path,
     sheet = sheet,
@@ -133,7 +102,7 @@ get_data <- function(sheet, path = check_path) {
   # only get data if we have a valid limits object
   if (!is.null(limits)) {
     data <- suppressMessages(read_excel(
-      check_path,
+      path,
       sheet = sheet,
       range = limits,
       col_types = "text"
@@ -143,13 +112,15 @@ get_data <- function(sheet, path = check_path) {
   return(list(info = info, data = data))
 }
 
-show_sheets <- function(sheets_to_show) {
+show_sheets <- function(sheets_to_show, path) {
   for (s in sheets_to_show) {
     msg <- paste0("\n## ", s, "\n\n")
     cat(msg)
-    res <- get_data(s)
+    # message("Sheet: ", s)
+    writeLines(paste("Sheet:", s), con = stderr())
+    res <- get_data(s, path)
 
-    cat("\n### Sheet info\n\n")
+    cat("\n### Info\n\n")
     if (interactive()) {
       print(knitr::kable(res$info)) # Simple table for interactive
     } else {
@@ -162,7 +133,7 @@ show_sheets <- function(sheets_to_show) {
       )
     }
 
-    cat("\n### Sheet data\n\n")
+    cat("\n### Data\n\n")
     if (interactive() & !is.null(res$data)) {
       print(knitr::kable(res$data)) # Simple table for interactive
     } else if (!is.null(res$data)) {
@@ -185,9 +156,10 @@ show_sheets <- function(sheets_to_show) {
 ```{r}
 #| label: show-sheets
 #| results: asis
+#| message: true
 
 sheets_to_show <- sheets_sort
-show_sheets(sheets_to_show)
+show_sheets(sheets_to_show, xdpath)
 
 ```
 
