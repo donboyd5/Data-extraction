@@ -12,3 +12,4 @@ _webpage/
 # individual files
 
 /.quarto/
+.Rproj.user
