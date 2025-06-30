@@ -2,13 +2,8 @@ testthat::local_edition(3)
 library(testthat)
 library(dplyr)
 
-# source("R/get_benmult_frs.R")
-# source("R/get_benmult_lookup.R")
-
-# test_cases <- read.csv("data/frs_benmult_test_cases_v5.csv")
-
 plan <- "frs"
-xddir <- fs::path(HH, "plans", plan)
+xddir <- fs::path(here::here(), "plans", plan)
 extracted_data <- paste0(plan, "_extracted_data.xlsm")
 xdpath <- fs::path(xddir, extracted_data)
 

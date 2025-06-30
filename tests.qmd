@@ -15,40 +15,49 @@ source(here::here("setup.R"))
 
 plan <- "frs"
 
-xddir <- fs::path(HH, "plans", plan)
+xddir <- fs::path(here::here(), "plans", plan)
 extracted_data <- paste0(plan, "_extracted_data.xlsm")
 xdpath <- fs::path(xddir, extracted_data)
-sheets <- readxl::excel_sheets(xdpath)
 
 ```
 
 ## Tests
 
-### Benefit-multiplier determination
+### Test whether necessary sheets are included
 
 ```{r}
-#| label: tests
-#| echo: true
+#| label: sheets-tests
 
-# Source benefit-multiplier functions
-source(here::here("plans", plan, "benefit-functions.R"))
-source(here::here("plans", plan, "lookup-functions.R"))
-
-# load lookup table and test data
-benefit_rules <- read_excel(xdpath, sheet = "benefit_rules", range = "D9:P98")
-test_cases <- read_excel(xdpath, sheet = "benefit_rules_test", range = "D6:L56")
-
-# run one or more benefit-multiplier tests
-
-testthat::test_file("tests/testthat/test-benefit-multiplier.R") # run all tests in the file
-
-# run a single test
-testthat::test_file(
-  "tests/testthat/test-benefit-multiplier.R",
-  desc = "benmult_function and benmult_lookup agree"
+results <- testthat::test_file(
+  "tests/testthat/test-sheets.R",
+  reporter = testthat::TapReporter$new()
 )
 
-# testthat::test_dir("tests/testthat") # Run all tests in directory
+```
 
+### Test benefit-multiplier rules and function
+
+```{r}
+#| label: benefit-multiplier-tests
+#| echo: true
+
+test_results <- testthat::test_file(
+  "tests/testthat/test-benefit-multiplier.R",
+  reporter = TapReporter$new()
+)
+
+# test_results |>
+#   as_tibble() |>
+#   filter(failed > 0)
+
+# Extract all test expectations
+# all_expectations <- unlist(lapply(test_results$results, function(x) x))
+
+# # Find failed expectations
+# failures <- Filter(function(x) inherits(x, "expectation_failure"), all_expectations)
+
+# if (length(failures) > 0 {
+#   waldo::compare(failures[[1]]$expected, failures[[1]]$actual)
+# }
 
 ```
