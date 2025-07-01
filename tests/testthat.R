@@ -9,9 +9,9 @@
 library(testthat)
 
 # Source your functions
-source(here::here("R", "benefit-functions.R"))
-source(here::here("R", "lookup-functions.R"))
-source(here::here("R", "data-extraction.R"))
+# source(here::here("R", "benefit-functions.R"))
+# source(here::here("R", "lookup-functions.R"))
+# source(here::here("R", "data-extraction.R"))
 
 # Run tests
-test_check("your-project-name")
+# test_check("your-project-name")

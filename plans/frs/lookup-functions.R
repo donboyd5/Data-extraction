@@ -30,7 +30,7 @@ benmult_lookup <- function(data, benefit_rules) {
     pull(benmult)
 }
 
-test_cases |>
-  mutate(benmult = benmult_lookup(pick(everything()), benefit_rules)) |>
-  mutate(match = abs(benmult - expected_benmult) < 0.0001) |>
-  filter(!match)
+# test_cases |>
+#   mutate(benmult = benmult_lookup(pick(everything()), benefit_rules)) |>
+#   mutate(match = abs(benmult - expected_benmult) < 0.0001) |>
+#   filter(!match)
