@@ -34,3 +34,5 @@ book:
 
 # script to clean desktop.ini just inside .git/:
 # Get-ChildItem -Path .git -Filter desktop.ini -Recurse | Remove-Item -Force
+
+# git update-ref -d refs/desktop.ini
