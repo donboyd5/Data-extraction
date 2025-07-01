@@ -12,18 +12,13 @@ format:
 #| label: setup
 
 source(here::here("setup.R"))
-
-plan <- "frs"
-
-xddir <- fs::path(here::here(), "plans", plan)
-extracted_data <- paste0(plan, "_extracted_data.xlsm")
-xdpath <- fs::path(xddir, extracted_data)
+source(here::here("plan_name.R"))
 
 ```
 
-## Tests
+# Tests
 
-### Test whether necessary sheets are included
+## Test whether necessary sheets are included
 
 ```{r}
 #| label: sheets-tests
@@ -35,7 +30,7 @@ results <- testthat::test_file(
 
 ```
 
-### Test benefit-multiplier rules and function
+## Test benefit-multiplier rules and function
 
 ```{r}
 #| label: benefit-multiplier-tests

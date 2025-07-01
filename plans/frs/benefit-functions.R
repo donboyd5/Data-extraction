@@ -1,7 +1,7 @@
 early_result <- function(class) {
   case_when(
     class == "regular" ~ 0.0160,
-    class == "special_risk" ~ 0.0300,
+    class == "special" ~ 0.0300,
     class == "judges" ~ 0.0333,
     class %in% c("eso", "eco") ~ 0.0300,
     class == "senior_management" ~ 0.0200,
@@ -37,13 +37,13 @@ normal_result <- function(class, tier, dist_age, yos, dist_year) {
       0.0160,
 
     # Special Risk Tier 1
-    class == "special_risk" &
+    class == "special" &
       tier == "tier_1" &
       ((dist_age >= 55 & yos >= 6) | yos >= 25) ~
       0.0300,
 
     # Special Risk Tier 2
-    class == "special_risk" &
+    class == "special" &
       tier == "tier_2" &
       ((dist_age >= 60 & yos >= 8) | yos >= 30) ~
       0.0300,

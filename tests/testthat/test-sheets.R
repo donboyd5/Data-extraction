@@ -3,10 +3,7 @@
 testthat::local_edition(3)
 library(testthat)
 
-plan <- "frs"
-xddir <- fs::path(here::here(), "plans", plan)
-extracted_data <- paste0(plan, "_extracted_data.xlsm")
-xdpath <- fs::path(xddir, extracted_data)
+source(here::here("plan_name.R"))
 
 sheets <- readxl::excel_sheets(xdpath)
 # note that deepseek prefers we not create sheets as a global variable
