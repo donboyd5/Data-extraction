@@ -5,12 +5,14 @@ editor_options:
 
 # Introduction
 
-This quarto project examines am Excel data workbook for a pension plan. It:
+This quarto project examines an Excel data workbook for a pension plan. It:
 
--   Checks to see whether it has the minimum number and kind of sheets required
+-   Gets all of the data sheets and their metadata, puts them into a list, and saves them as an .rds file
+-   Checks to see whether the data has the minimum number and kind of sheets required
 -   Runs selected tests on the data to see whether it meets requirements
+-   For each sheet, shows its metadata and data
 
-The goal is to find problems as early as possible in the process.
+<!-- The goal is to find problems as early as possible in the process. -->
 
 ## Setting up the Excel workbook
 
