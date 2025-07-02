@@ -135,7 +135,3 @@ benmult_function <- function(data) {
     ) |>
     pull(result)
 }
-
-# summary(test_cases)
-# check <- test_cases |>
-#   mutate(benmult = benmult_function(pick(everything())))
