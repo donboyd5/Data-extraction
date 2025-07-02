@@ -3,13 +3,22 @@
 testthat::local_edition(3)
 library(testthat)
 
-source(here::here("plan_name.R"))
+source(here::here("plan-name.R"))
 
-sheets <- readxl::excel_sheets(xdpath)
+fname <- paste0(plan, "_inputs_raw.rds")
+input_data_list <- readRDS(fs::path(xddir, fname))
+
+# sheets <- readxl::excel_sheets(xdpath)
+sheets <- names(input_data_list)
 # note that deepseek prefers we not create sheets as a global variable
 
 test_that("Workbook has required exact-match sheets", {
-  required_sheets <- c("salary_growth", "retirees")
+  required_sheets <- c(
+    "benefit_rules",
+    "constants_assumptions",
+    "constants_funding",
+    "salarygrowth"
+  )
   cat("\n## Testing for existence of following required sheets:\n")
   cat(paste(required_sheets, collapse = ", "), "\n")
 

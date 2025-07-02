@@ -13,10 +13,9 @@ format:
 ```{r}
 #| label: setup
 
-plan <- "frs"
-
 source(here::here("setup.R"))
-source(here::here("plan_name.R"))
+source(here::here("plan-name.R"))
+source(here::here("functions-data.R"))
 
 ```
 
@@ -25,8 +24,12 @@ source(here::here("plan_name.R"))
 
 ```{r}
 #| label: get-sheetnames
+#|
+fname <- paste0(plan, "_inputs_raw.rds")
+input_data_list <- readRDS(fs::path(xddir, fname))
 
-sheets <- readxl::excel_sheets(xdpath)
+# sheets <- readxl::excel_sheets(xdpath)
+sheets_to_show <- names(input_data_list)
 
 ```
 
@@ -47,9 +50,9 @@ sheets <- readxl::excel_sheets(xdpath)
 
 # define sheets to show
 # exclude <- c("process", "conventions", "abbreviations", "sheets")
-exclude <- c("0_process", "0_conventions", "0_abbreviations", "0_sheets")
-sheets_show <- setdiff(sheets, exclude)
-sheets_sort <- sheets_show |> sort()
+# exclude <- c("0_process", "0_conventions", "0_abbreviations", "0_sheets")
+# sheets_show <- setdiff(sheets, exclude)
+# sheets_sort <- sheets_show |> sort()
 
 ```
 
@@ -57,65 +60,14 @@ sheets_sort <- sheets_show |> sort()
 ```{r}
 #| label: sheet-functions
 
-get_item <- function(s, info) {
-  value <- info$value[info$item == s]
-}
-
-item_exists <- function(s, info) {
-  any(info$item == s & !is.na(info$value))
-}
-
-get_limits <- function(info) {
-  limits <- NULL
-  if (
-    item_exists("start_col", info) &&
-      item_exists("end_col", info) &&
-      item_exists("start_row", info)
-  ) {
-    start_col <- cellranger::letter_to_num(get_item("start_col", info))
-    end_col <- cellranger::letter_to_num(get_item("end_col", info))
-    start_row <- get_item("start_row", info) |> as.numeric()
-    # Create cell_limits object
-    limits <- cell_limits(
-      ul = c(start_row, start_col),
-      lr = c(NA, end_col) # NA means go to bottom of the sheet
-    )
-  }
-  limits
-}
-
-get_data <- function(sheet, path) {
-  info <- suppressMessages(read_excel(
-    path,
-    sheet = sheet,
-    range = cell_cols("A:B"),
-    col_names = c("item", "value")
-  ))
-  info <- bind_rows(tibble(item = "sheet", value = sheet), info)
-
-  limits <- get_limits(info)
-
-  data <- NULL
-  # only get data if we have a valid limits object
-  if (!is.null(limits)) {
-    data <- suppressMessages(read_excel(
-      path,
-      sheet = sheet,
-      range = limits,
-      col_types = "text"
-    ))
-  }
-
-  return(list(info = info, data = data))
-}
-
-show_sheets <- function(sheets_to_show, path) {
+show_sheets <- function(sheets_to_show, data) {
   for (s in sheets_to_show) {
     msg <- paste0("\n## ", s, "\n\n")
     cat(msg)
     # message("Sheet: ", s)
     writeLines(paste("Sheet:", s), con = stderr())
-    res <- get_data(s, path)
+    # res <- get_data(s, path)
+    res <- data[[s]]
 
     cat("\n### Info\n\n")
     if (interactive()) {
@@ -155,8 +107,8 @@ show_sheets <- function(sheets_to_show, path) {
 #| results: asis
 #| message: true
 
-sheets_to_show <- sheets_sort
-show_sheets(sheets_to_show, xdpath)
+# sheets_to_show <- sheets_sort
+show_sheets(sheets_to_show, input_data_list)
 
 ```
 

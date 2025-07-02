@@ -17,6 +17,7 @@ _webpage/
 *.gdoc
 *.html
 *.pdf
+*.rds
 *.vdoc*
 *.xls*
 
