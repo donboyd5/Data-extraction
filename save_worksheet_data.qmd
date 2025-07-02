@@ -39,7 +39,7 @@ Put info into a list, save as rds.
 
 inputs_list <- sheets_get |>
   set_names() |>
-  purrr::map(get_data, path)
+  purrr::map(get_data, xdpath)
 
 names(inputs_list)
 inputs_list$benefit_rules
