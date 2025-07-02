@@ -1,20 +1,32 @@
 testthat::local_edition(3)
 library(testthat)
 library(dplyr)
+library(readxl)
 
-source(here::here("plan_name.R"))
+source(here::here("plan-name.R"))
+source(here::here("functions-data.R"))
+
+fname <- paste0(plan, "_inputs_raw.rds")
+input_data_list <- readRDS(fs::path(xddir, fname))
 
 # Source benefit-multiplier functions
 source(here::here("plans", plan, "benefit-functions.R"))
 source(here::here("plans", plan, "lookup-functions.R"))
 
 # load lookup table and test data
-benefit_rules <- read_excel(xdpath, sheet = "benefit_rules", range = "D9:P98")
-test_cases <- read_excel(
-  xdpath,
-  sheet = "benefit_rules_test",
-  range = "D11:L61"
-)
+# data <- get_data("benefit_rules", xdpath)
+
+benefit_rules <- input_data_list[["benefit_rules"]]$data |>
+  mutate(
+    across(c(dist_age_min_ge:dist_year_max_lt, benmult), as.numeric),
+    early_retirement = as.logical(early_retirement)
+  )
+
+test_cases <- input_data_list[["benefit_rules_test"]]$data |>
+  mutate(
+    across(dist_age:expected_benmult, as.numeric),
+    early_retirement = as.logical(early_retirement)
+  )
 
 test_that("benmult_function matches expected benmult", {
   tc <- test_cases |>

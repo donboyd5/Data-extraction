@@ -12,7 +12,16 @@ format:
 #| label: setup
 
 source(here::here("setup.R"))
-source(here::here("plan_name.R"))
+source(here::here("plan-name.R"))
+source(here::here("functions-data.R"))
+
+```
+
+```{r}
+#| eval: false
+
+fname <- paste0(plan, "_inputs_raw.rds")
+input_data_list <- readRDS(fs::path(xddir, fname))
 
 ```
 
@@ -23,7 +32,7 @@ source(here::here("plan_name.R"))
 ```{r}
 #| label: sheets-tests
 
-results <- testthat::test_file(
+test_results <- testthat::test_file(
   "tests/testthat/test-sheets.R",
   reporter = testthat::TapReporter$new()
 )
